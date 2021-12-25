@@ -1,17 +1,31 @@
 {
   "name": "github-jsdelivr-upload",
-  "version": "1.0.0",
-  "description": "",
+  "version": "1.0.2",
+  "description": "upload your files to github and replace your src with jsdelivr",
   "main": "dist/index.js",
   "cjs": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "browser": "dist/index.umd.js",
+  "keywords": [
+    "jsdelivr",
+    "github",
+    "webpack",
+    "upload",
+    "cdn",
+    "CDN",
+    "免费cdn",
+    "免费CDN"
+  ],
   "scripts": {
     "start": "rollup -c -w",
     "build": "rimraf ./dist && rollup -c",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "author": "xiaoyu",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sulgweb/github-jsdelivr-upload.git"
+},
   "license": "ISC",
   "devDependencies": {
     "@babel/cli": "^7.16.0",
