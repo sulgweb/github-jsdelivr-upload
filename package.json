@@ -1,5 +1,5 @@
 {
-  "name": "github-upload",
+  "name": "github-jsdelivr-upload",
   "version": "1.0.0",
   "description": "",
   "main": "dist/index.js",
