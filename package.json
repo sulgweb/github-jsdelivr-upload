@@ -1,0 +1,40 @@
+{
+  "name": "github-upload",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "cjs": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "browser": "dist/index.umd.js",
+  "scripts": {
+    "start": "rollup -c -w",
+    "build": "rimraf ./dist && rollup -c",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.5",
+    "@babel/plugin-external-helpers": "^7.16.5",
+    "@babel/preset-env": "^7.16.5",
+    "eslint-config-alloy": "^4.4.0",
+    "octokit": "^1.7.1",
+    "prettier": "^2.5.1",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.61.1",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-eslint": "^7.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-prettier": "^2.2.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.31.1",
+    "tslib": "^2.3.1",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {},
+  "eslintConfig": {
+    "parser": "babel-eslint"
+  }
+}
