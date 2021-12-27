@@ -6,6 +6,8 @@
 
 它的原理是将文件上传到github的public仓库中，然后利用jsdelivr生成cdn，并且在合适的webpack生命周期中通过html-webpack-plugin提供的hook，修改页面中link、script标签，更换为jsdelivr中的cdn路径。
 
+注：使用的html-webpack-plugin为4.x
+
 
 
 ### 用法
