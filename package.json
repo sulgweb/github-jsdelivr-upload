@@ -1,6 +1,6 @@
 {
   "name": "github-jsdelivr-upload",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "upload your files to github and replace your src with jsdelivr",
   "main": "dist/index.js",
   "cjs": "dist/index.cjs.js",
@@ -47,7 +47,8 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "octokit": "^1.7.1"
+    "html-webpack-plugin": "4.5.2",
+    "octokit": "1.7.1"
   },
   "eslintConfig": {
     "parser": "babel-eslint"
