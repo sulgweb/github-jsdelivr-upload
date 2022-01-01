@@ -83,13 +83,32 @@ class UploadGithub {
 
   apply(compiler) {
     compiler.hooks.compilation.tap(this.pluginName, (compilation) => {
-      HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync('newTest', async (data, cb) => {
+      HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(this.pluginName, async (data, cb) => {
         const assets = getAssets(compilation)
         const cdnUrl = `${this.jsDelivrUrl}/${this.owner}/${this.repo}/${this.basePath}`
         const newAssetJson = ['/']
+        const errorFunc = `<script>
+          function errorCDN(e) {
+            var target = e.getAttribute("data-cdn");
+            var tagName = e.tagName
+            var cdnDOM = document.createElement(tagName);
+            if(tagName === 'SCRIPT'){
+              cdnDOM.src = "./" + target;
+            }else{
+              cdnDOM.href = "./" + target;
+            }
+            document.head.appendChild(cdnDOM);
+            e.remove();
+          }
+        </script>`
+        const dataHtmlList = data.html.toString().split('<head>')
+        data.html = dataHtmlList.shift() + '<head>' + errorFunc + dataHtmlList.join('')
         for(let i in assets){
           for(let item of assets[i]){
-            data.html = data.html.replace(`/${item}`, `${cdnUrl}/${item}`)
+            const srcReg = new RegExp('src=' + `['|"]` + `/${item}`+ `['|"]`, 'gi')
+            const hrefReg = new RegExp('href=' + `['|"]` + `/${item}`+ `['|"]`, 'gi')
+            data.html = data.html.replace(srcReg, `src="${cdnUrl}/${item}" data-cdn="${item}" onerror="errorCDN(this)"`)
+            data.html = data.html.replace(hrefReg, `href="${cdnUrl}/${item}" data-cdn="${item}" onerror="errorCDN(this)"`)
             newAssetJson.push(`${cdnUrl}/${item}`)
           }
         }
