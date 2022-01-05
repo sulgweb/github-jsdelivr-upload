@@ -1,4 +1,3 @@
-// import fs from 'fs'
 const fs = require('fs')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const {
@@ -7,7 +6,7 @@ const {
 
 const fileToBase64 = (filePath) => {
   const data = fs.readFileSync(filePath);
-  return new Buffer(data).toString("base64")
+  return Buffer.from(data).toString("base64")
 }
 
 const getAssets = (compilation) => {
@@ -29,7 +28,7 @@ const getAssets = (compilation) => {
   const assets = {
     js: [],
     css: [],
-    uncase: [] // 意料之外的文件
+    // uncase: [] // 意料之外的文件
   }
 
   files.forEach(f => {
@@ -38,7 +37,7 @@ const getAssets = (compilation) => {
     if (assets[ext]) {
       assets[ext].push(f)
     } else {
-      assets.uncase.push(f)
+      // assets.uncase.push(f)
     }
   })
   return assets
@@ -52,17 +51,27 @@ class UploadGithub {
   repo: string
   outputPath: string
   basePath: string | number
+  cdnType: string
+  baseCdnUrl: string
+
+
   constructor(data) {
     const {
       token,
       owner,
-      repo
+      repo,
+      cdnType,
     } = data;
+    const cdnUrlObj = {
+      jsDelivr: 'https://cdn.jsdelivr.net/gh',
+      staticaly: 'https://cdn.staticaly.com/gh',
+    }
+    this.cdnType = cdnType || 'jsDelivr'
     this.octokit = new Octokit({
       auth: token
     })
     this.pluginName = 'UploadGithub'
-    this.jsDelivrUrl = 'https://cdn.jsdelivr.net/gh'
+    this.baseCdnUrl = cdnUrlObj[this.cdnType] || cdnUrlObj.jsDelivr
     this.owner = owner
     this.repo = repo
     this.outputPath = ''
@@ -85,7 +94,7 @@ class UploadGithub {
     compiler.hooks.compilation.tap(this.pluginName, (compilation) => {
       HtmlWebpackPlugin.getHooks(compilation).beforeEmit.tapAsync(this.pluginName, async (data, cb) => {
         const assets = getAssets(compilation)
-        const cdnUrl = `${this.jsDelivrUrl}/${this.owner}/${this.repo}/${this.basePath}`
+        const cdnUrl = `${this.baseCdnUrl}/${this.owner}/${this.repo}${this.cdnType === 'staticaly' ? '/main' : ''}/${this.basePath}`
         const newAssetJson = ['/']
         const errorFunc = `<script>
           function errorCDN(e) {
@@ -103,10 +112,10 @@ class UploadGithub {
         </script>`
         const dataHtmlList = data.html.toString().split('<head>')
         data.html = dataHtmlList.shift() + '<head>' + errorFunc + dataHtmlList.join('')
-        for(let i in assets){
-          for(let item of assets[i]){
-            const srcReg = new RegExp('src=' + `['|"]` + `/${item}`+ `['|"]`, 'gi')
-            const hrefReg = new RegExp('href=' + `['|"]` + `/${item}`+ `['|"]`, 'gi')
+        for (let i in assets) {
+          for (let item of assets[i]) {
+            const srcReg = new RegExp('src=' + `['|"]` + `/${item}` + `['|"]`, 'gi')
+            const hrefReg = new RegExp('href=' + `['|"]` + `/${item}` + `['|"]`, 'gi')
             data.html = data.html.replace(srcReg, `src="${cdnUrl}/${item}" data-cdn="${item}" onerror="errorCDN(this)"`)
             data.html = data.html.replace(hrefReg, `href="${cdnUrl}/${item}" data-cdn="${item}" onerror="errorCDN(this)"`)
             newAssetJson.push(`${cdnUrl}/${item}`)
@@ -116,7 +125,7 @@ class UploadGithub {
         cb(null, data)
       })
     })
-    compiler.hooks.afterEmit.tapAsync(this.pluginName, async(compilation, callback)=>{
+    compiler.hooks.afterEmit.tapAsync(this.pluginName, async (compilation, callback) => {
       const assets = getAssets(compilation)
       const outputPath = compilation.compiler.outputPath;
       const githubUploadList = []
